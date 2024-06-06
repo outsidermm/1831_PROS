@@ -5,18 +5,8 @@
 enum class AutonSelector { NONE, LEFT, RIGHT };
 AutonSelector auton_runner = AutonSelector::NONE;
 
-void btn_l1_actions();
-void btn_l2_actions();
-void btn_r1_actions();
-void btn_r2_actions();
-void btn_up_actions();
-void btn_down_actions();
-void btn_left_actions();
-void btn_right_actions();
-void btn_x_actions();
-void btn_a_actions();
-void btn_b_actions();
-void btn_y_actions();
+void btn_l1_actions() { int i = 1; }
+
 
 // Drivetrain
 pros::MotorGroup drive_group_l({1, 2, 3}, pros::MotorGears::rpm_600,
@@ -92,12 +82,12 @@ void competition_initialize() {}
  */
 void autonomous() {
   switch (auton_runner) {
-    case AutonSelector::LEFT: // left Side Program Here
-      break;
-    case AutonSelector::RIGHT: // Right Side Program Here
-      break;
-    case AutonSelector::NONE:
-      break;
+  case AutonSelector::LEFT: // left Side Program Here
+    break;
+  case AutonSelector::RIGHT: // Right Side Program Here
+    break;
+  case AutonSelector::NONE:
+    break;
   }
 }
 
@@ -117,33 +107,10 @@ void autonomous() {
 void opcontrol() {
   while (true) {
 
-      
-      // Button Binding
-      // Use get_digital if pressing, get_digital_new_press if toggling
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-        btn_l1_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-        btn_l2_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
-        btn_r1_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
-        btn_r2_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
-        btn_up_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
-        btn_down_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
-        btn_left_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
-        btn_right_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-        btn_x_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_A))
-        btn_a_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_B))
-        btn_b_actions();
-      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
-        btn_y_actions();
-    pros::delay(20);           // Run for 20 ms then update
+    // Button Binding
+    // Use get_digital if pressing, get_digital_new_press if toggling
+    if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+      btn_l1_actions();
+    pros::delay(20); // Run for 20 ms then update
   }
 }

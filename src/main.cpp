@@ -57,7 +57,7 @@ void initialize() {
   while (inertial.is_calibrating()) {
     pros::delay(20);
   }
-
+  // TODO: Add autonomous selector callback here
   pros::lcd::set_text(1, "Good to go.");
 }
 

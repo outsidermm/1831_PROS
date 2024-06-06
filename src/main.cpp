@@ -1,21 +1,49 @@
 #include "main.h"
+#include "config.hpp"
+#include "pros/llemu.hpp"
 
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
+enum class AutonSelector { NONE, LEFT, RIGHT };
+AutonSelector auton_runner = AutonSelector::NONE;
+
+void btn_l1_actions();
+void btn_l2_actions();
+void btn_r1_actions();
+void btn_r2_actions();
+void btn_up_actions();
+void btn_down_actions();
+void btn_left_actions();
+void btn_right_actions();
+void btn_x_actions();
+void btn_a_actions();
+void btn_b_actions();
+void btn_y_actions();
+
+// Drivetrain
+pros::MotorGroup drive_group_l({1, 2, 3}, pros::MotorGears::rpm_600,
+                               pros::MotorUnits::counts);
+pros::MotorGroup drive_group_r({4, 5, 6}, pros::MotorGears::rpm_600,
+                               pros::MotorUnits::counts);
+
+// Movement
+pros::Imu inertial(11);
+
+// Controllers
+pros::Controller con_player(pros::E_CONTROLLER_MASTER);
+
+void left_callback() {
+  auton_runner = AutonSelector::LEFT;
+  pros::lcd::print(6, "Left Side Autonomous");
 }
 
+void center_callback() {
+  auton_runner = AutonSelector::RIGHT;
+  pros::lcd::print(6, "Right Side Autonomous");
+}
+
+void right_callback() {
+  auton_runner = AutonSelector::NONE;
+  pros::lcd::print(6, "No Autonomous");
+}
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -23,10 +51,14 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+  pros::lcd::initialize();
+  pros::lcd::set_text(1, "Calibrating Inertial...");
+  inertial.reset();
+  while (inertial.is_calibrating()) {
+    pros::delay(20);
+  }
 
-	pros::lcd::register_btn1_cb(on_center_button);
+  pros::lcd::set_text(1, "Good to go.");
 }
 
 /**
@@ -58,7 +90,16 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+  switch (auton_runner) {
+    case AutonSelector::LEFT: // left Side Program Here
+      break;
+    case AutonSelector::RIGHT: // Right Side Program Here
+      break;
+    case AutonSelector::NONE:
+      break;
+  }
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -74,21 +115,35 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::MotorGroup left_mg({1, -2, 3});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({-4, 5, -6});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
+  while (true) {
 
-
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
-
-		// Arcade control scheme
-		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		left_mg.move(dir - turn);                      // Sets left motor voltage
-		right_mg.move(dir + turn);                     // Sets right motor voltage
-		pros::delay(20);                               // Run for 20 ms then update
-	}
+      
+      // Button Binding
+      // Use get_digital if pressing, get_digital_new_press if toggling
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+        btn_l1_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+        btn_l2_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+        btn_r1_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+        btn_r2_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
+        btn_up_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
+        btn_down_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
+        btn_left_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
+        btn_right_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+        btn_x_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+        btn_a_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_B))
+        btn_b_actions();
+      if (con_player.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+        btn_y_actions();
+    pros::delay(20);           // Run for 20 ms then update
+  }
 }
